@@ -1,6 +1,7 @@
 package common
 
 import (
+	"strings"
 	"text/scanner"
 
 	"github.com/graph-gophers/graphql-go/types"
@@ -17,7 +18,15 @@ func ParseLiteral(l *Lexer, constOnly bool) types.Value {
 		l.ConsumeToken('$')
 		return &types.Variable{Name: l.ConsumeIdent(), Loc: loc}
 
-	case scanner.Int, scanner.Float, scanner.String, scanner.Ident:
+	case scanner.String:
+		lit := l.ConsumeLiteral()
+		if lit.Type == scanner.Ident && lit.Text == "null" {
+			return &types.NullValue{loc}
+		}
+		lit.Loc = loc
+		lit.Text = strings.Trim(lit.Text, "\"")
+		return lit
+	case scanner.Int, scanner.Float, scanner.Ident:
 		lit := l.ConsumeLiteral()
 		if lit.Type == scanner.Ident && lit.Text == "null" {
 			return &types.NullValue{Loc: loc}
