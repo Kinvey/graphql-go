@@ -26,6 +26,15 @@ func (s *Schema) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(result.Data, "", "\t")
 }
 
+// Introspection execs an introspection query against the schema.
+func (s *Schema) Introspection(query string) *Response {
+	return s.exec(context.Background(), query, "", nil, &resolvable.Schema{
+		Meta:   s.res.Meta,
+		Query:  &resolvable.Object{},
+		Schema: *s.schema,
+	})
+}
+
 var introspectionQuery = `
   query {
     __schema {
