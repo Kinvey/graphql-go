@@ -45,7 +45,11 @@ func (val *PrimitiveValue) Deserialize(vars map[string]interface{}) interface{} 
 		return value
 
 	case scanner.String:
-		return val.Text
+		value, err := strconv.Unquote(val.Text)
+		if err != nil {
+			panic(err)
+		}
+		return value
 
 	case scanner.Ident:
 		switch val.Text {
