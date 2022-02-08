@@ -57,6 +57,7 @@ func (s *Schema) subscribe(ctx context.Context, queryString string, operationNam
 		Tracer:                   s.tracer,
 		Logger:                   s.logger,
 		PanicHandler:             s.panicHandler,
+		ErrorHandler:             s.errorHandler,
 		SubscribeResolverTimeout: s.subscribeResolverTimeout,
 	}
 	varTypes := make(map[string]*introspection.Type)
