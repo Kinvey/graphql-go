@@ -189,7 +189,7 @@ func getResolverErr(r *Request, returnedErr reflect.Value, path *types.PathSegme
 	err := errors.Errorf("%s", resolverErr)
 	err.Path = path.ToSlice()
 	err.ResolverError = resolverErr
-	if ex, ok := returnedErr.Interface().(extensionser); ok {
+	if ex, ok := resolverErr.(extensionser); ok {
 		err.Extensions = ex.Extensions()
 	}
 	return err
