@@ -183,9 +183,9 @@ func selectionToSelectedFields(internalSelection []selected.Selection) []*types.
 	return fieldSelection
 }
 
-func getResolverErr(r *Request, returnedErr reflect.Value, path *types.PathSegment) *errors.QueryError {
+func getResolverErr(ctx context.Context, r *Request, returnedErr reflect.Value, path *types.PathSegment) *errors.QueryError {
 	resolverErr := returnedErr.Interface().(error)
-	resolverErr = r.ErrorHandler.TransformError(resolverErr)
+	resolverErr = r.ErrorHandler.TransformError(ctx, resolverErr)
 	err := errors.Errorf("%s", resolverErr)
 	err.Path = path.ToSlice()
 	err.ResolverError = resolverErr
@@ -263,14 +263,14 @@ func execFieldSelection(ctx context.Context, r *Request, s *resolvable.Schema, f
 				if dr, ok := tmpResult.Interface().(types.DynamicResolver); ok && dr.HasScalarValue() {
 					resolverResult, resolverErr := dr.Resolve(traceCtx, f.field.FieldDefinition, *path, f.field.Args)
 					if resolverErr != nil {
-						return getResolverErr(r, reflect.ValueOf(resolverErr), path)
+						return getResolverErr(ctx, r, reflect.ValueOf(resolverErr), path)
 					}
 					result = reflect.ValueOf(resolverResult)
 				}
 			}
 
 			if f.field.HasError && !callOut[1].IsNil() {
-				return getResolverErr(r, callOut[1], path)
+				return getResolverErr(ctx, r, callOut[1], path)
 			}
 		} else {
 			// TODO extract out unwrapping ptr logic to a common place
